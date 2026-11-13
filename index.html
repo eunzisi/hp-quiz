@@ -1,1091 +1,1295 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>해리포터 호그와트 기말고사</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Sansita+Swashed:wght@700&display=swap');
-    
-    body {
-      font-family: 'Noto Serif KR', serif;
-      background: radial-gradient(circle at center, #1a0b2e 0%, #090314 100%);
-      color: #f3e5ab;
-    }
-    .font-magic { font-family: 'Sansita Swashed', cursive; }
-    
-    /* 기숙사별 컬러 정의 */
-    .house-gryffindor { background-color: #740001; border-color: #d3a625; color: #f3e5ab; }
-    .house-slytherin { background-color: #1a472a; border-color: #aaaaaa; color: #f3e5ab; }
-    .house-ravenclaw { background-color: #0e1a40; border-color: #946b2d; color: #f3e5ab; }
-    .house-hufflepuff { background-color: #ecb939; border-color: #372e29; color: #372e29; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해리포터 호그와트 기말고사</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Sansita+Swashed:wght@700&display=swap');
 
-    /* 마법 효과 및 애니메이션 */
-    .magic-card {
-      background: rgba(20, 10, 35, 0.82);
-      backdrop-filter: blur(10px);
-      border: 2px solid #d3a625;
-      box-shadow: 0 0 20px rgba(211, 166, 37, 0.2);
-    }
-    
-    .gold-glow {
-      text-shadow: 0 0 10px rgba(211, 166, 37, 0.7);
-    }
+body {
+  font-family: 'Noto Serif KR', serif;
+  background: radial-gradient(circle at center, #1a0b2e 0%, #090314 100%);
+  color: #f3e5ab;
+}
+.font-magic { font-family: 'Sansita Swashed', cursive; }
 
-    .btn-magic {
-      background: linear-gradient(135deg, #4a154b 0%, #2b0938 100%);
-      border: 1px solid #d3a625;
-      transition: all 0.2s;
-    }
-    .btn-magic:hover {
-      background: linear-gradient(135deg, #631c65 0%, #3d0d4f 100%);
-      box-shadow: 0 0 15px rgba(211, 166, 37, 0.5);
-      transform: translateY(-2px);
-    }
+/* 기숙사별 컬러 정의 */
+.house-gryffindor { background-color: #740001; border-color: #d3a625; color: #f3e5ab; }
+.house-slytherin { background-color: #1a472a; border-color: #aaaaaa; color: #f3e5ab; }
+.house-ravenclaw { background-color: #0e1a40; border-color: #946b2d; color: #f3e5ab; }
+.house-hufflepuff { background-color: #ecb939; border-color: #372e29; color: #372e29; }
 
-    /* 선택지 버튼 색상 */
-    .opt-0 { background: #c0392b; }
-    .opt-1 { background: #2980b9; }
-    .opt-2 { background: #d35400; }
-    .opt-3 { background: #27ae60; }
-  </style>
+/* 마법 효과 및 애니메이션 */
+.magic-card {
+  background: rgba(20, 10, 35, 0.85);
+  backdrop-filter: blur(10px);
+  border: 2px solid #d3a625;
+  box-shadow: 0 0 20px rgba(211, 166, 37, 0.2);
+}
+.gold-glow {
+  text-shadow: 0 0 10px rgba(211, 166, 37, 0.7);
+}
+.btn-magic {
+  background: linear-gradient(135deg, #4a154b 0%, #2b0938 100%);
+  border: 1px solid #d3a625;
+  transition: all 0.2s;
+}
+.btn-magic:hover:not(:disabled) {
+  background: linear-gradient(135deg, #631c65 0%, #3d0d4f 100%);
+  box-shadow: 0 0 15px rgba(211, 166, 37, 0.5);
+  transform: translateY(-2px);
+}
+
+/* 선택지 버튼 색상 */
+.opt-0 { background: #c0392b; }
+.opt-1 { background: #2980b9; }
+.opt-2 { background: #d35400; }
+.opt-3 { background: #27ae60; }
+
+/* 스크롤바 커스텀 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(211, 166, 37, 0.6);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(211, 166, 37, 0.9);
+}
+</style>
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 selection:bg-yellow-500 selection:text-black">
 
-  <!-- Header -->
-  <header class="text-center py-4 border-b border-yellow-600/30 flex justify-between items-center px-4 max-w-5xl mx-auto w-full">
-    <div onclick="showRoleSelection()" class="flex items-center space-x-2 cursor-pointer">
-      <i class="fa-solid fa-hat-wizard text-2xl text-yellow-500"></i>
-      <span class="font-magic text-2xl text-yellow-500 tracking-wider">Hogwarts Quiz</span>
-    </div>
-    <div id="role-badge" class="text-xs px-3 py-1 rounded-full border border-yellow-500/50 bg-yellow-950/40">
-      역할 선택 필요
-    </div>
-  </header>
+<!-- Header -->
+<header class="text-center py-4 border-b border-yellow-600/30 flex justify-between items-center px-4 max-w-5xl mx-auto w-full">
+  <div onclick="showRoleSelection()" class="flex items-center space-x-2 cursor-pointer">
+    <i class="fa-solid fa-hat-wizard text-2xl text-yellow-500"></i>
+    <span class="font-magic text-2xl text-yellow-500 tracking-wider">Hogwarts Quiz</span>
+  </div>
+  <div id="role-badge" class="text-xs px-3 py-1 rounded-full border border-yellow-500/50 bg-yellow-950/40">
+    역할 선택 필요
+  </div>
+</header>
 
-  <!-- Main Content Area -->
-  <main id="app" class="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center items-center py-6">
-    <!-- 화면이 동적으로 로드됩니다 -->
-  </main>
+<!-- Main Content Area -->
+<main id="app" class="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-center items-center py-6">
+  <!-- 화면이 동적으로 로드됩니다 -->
+</main>
 
-  <!-- 비디오 모달 (위원장 비밀코드 입력 시 활성화) -->
-  <div id="video-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="magic-card p-4 rounded-2xl max-w-2xl w-full relative">
-      <button onclick="closeVideoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-8 h-8 font-bold border border-yellow-400">✕</button>
-      <h3 class="text-xl font-bold text-yellow-400 mb-3 text-center">🎬 위원장 특별 영상</h3>
-      <div class="aspect-video w-full rounded-xl overflow-hidden border border-yellow-500/40">
-        <iframe id="video-iframe" class="w-full h-full" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
+<!-- 비디오 모달 (위원장 비밀코드 입력 시 활성화) -->
+<div id="video-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+  <div class="magic-card p-4 rounded-2xl max-w-2xl w-full relative">
+    <button onclick="closeVideoModal()" class="absolute -top-3 -right-3 bg-red-600 text-white rounded-full w-8 h-8 font-bold border border-yellow-400">×</button>
+    <h3 class="text-xl font-bold text-yellow-400 mb-3 text-center">위원장 특별 영상</h3>
+    <div class="aspect-video w-full rounded-xl overflow-hidden border border-yellow-500/40">
+      <iframe id="video-iframe" class="w-full h-full" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
   </div>
+</div>
 
-  <!-- Footer -->
-  <footer class="text-center text-xs text-yellow-600/60 py-4 border-t border-yellow-600/20">
-    <p>⚡ Hogwarts School of Witchcraft and Wizardry ⚡</p>
-  </footer>
+<!-- Footer -->
+<footer class="text-center text-xs text-yellow-600/60 py-4 border-t border-yellow-600/20">
+  <p>Hogwarts School of Witchcraft and Wizardry</p>
+</footer>
 
-  <script>
-    // ==========================================
-    // 0. Supabase 및 보안 설정
-    // ==========================================
-    const SUPABASE_URL = 'https://aovwphtavvdpnqjvgtgf.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_7g0SifR0AHT71mEyMfGVfQ_XkLvhKEi';
-    const ADMIN_PASSWORD = '1105';     // 운영자 페이지 비밀번호
-    const CHAIRMAN_CODE = '1234';      // 위원장 비밀코드
-    const VIDEO_URL = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1';
+<script>
+// ==========================================
+// 0. Supabase 및 보안 설정
+// ==========================================
+const SUPABASE_URL = 'https://aovwphtavvdpnqjvgtgf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7g0SifR0AHT71mEyMfGVfQ_XkLvhKEi';
 
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const ADMIN_PASSWORD = '1105';   // 운영자 페이지 비밀번호
+const CHAIRMAN_CODE = '1234';    // 위원장 비밀코드
+const VIDEO_URL = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1';
 
-    // ==========================================
-    // 1. 기본 퀴즈 데이터 및 로컬스토리지 연동
-    // ==========================================
-    const DEFAULT_QUIZ_DATA = [
-      {
-        id: 1,
-        question: "해리 포터의 생일은 몇 월 몇 일일까요?",
-        imageUrl: "",
-        options: ["6월 30일", "7월 31일", "8월 1일", "9월 1일"],
-        answer: 1,
-        timeLimit: 15,
-        points: 1000
-      },
-      {
-        id: 2,
-        question: "호그와트 4대 기숙사가 아닌 것은 무엇일까요?",
-        imageUrl: "",
-        options: ["그리핀도르", "슬리데린", "후플푸프", "볼드모트"],
-        answer: 3,
-        timeLimit: 10,
-        points: 1000
-      },
-      {
-        id: 3,
-        question: "물건을 소환할 때 쓰는 주문은 무엇일까요?",
-        imageUrl: "",
-        options: ["알로호모라", "아시오", "루모스", "익스펙토 페트로눔"],
-        answer: 1,
-        timeLimit: 12,
-        points: 1000
-      },
-      {
-        id: 4,
-        question: "볼드모트의 본명은 무엇일까요?",
-        imageUrl: "",
-        options: ["톰 마볼로 리들", "겔러트 그린델왈드", "세베루스 스네이프", "시리우스 블랙"],
-        answer: 0,
-        timeLimit: 15,
-        points: 1000
-      }
-    ];
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function loadQuizData() {
-      try {
-        const saved = localStorage.getItem('hp_custom_quiz_data');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch (e) {
-        console.error(e);
-      }
-      return JSON.parse(JSON.stringify(DEFAULT_QUIZ_DATA));
-    }
+// ==========================================
+// 1. 기본 퀴즈 데이터 및 서버(Supabase) 영구 동기화
+// ==========================================
+const DEFAULT_QUIZ_DATA = [
+  {
+    id: 1,
+    question: "해리 포터의 생일은 몇 월 몇 일일까요?",
+    imageUrl: "",
+    options: ["6월 30일", "7월 31일", "8월 1일", "9월 1일"],
+    answer: 1,
+    timeLimit: 15,
+    points: 1000
+  },
+  {
+    id: 2,
+    question: "호그와트 4대 기숙사가 아닌 것은 무엇일까요?",
+    imageUrl: "",
+    options: ["그리핀도르", "슬리데린", "후플푸프", "볼드모트"],
+    answer: 3,
+    timeLimit: 10,
+    points: 1000
+  },
+  {
+    id: 3,
+    question: "물건을 소환할 때 쓰는 주문은 무엇일까요?",
+    imageUrl: "",
+    options: ["알로호모라", "아시오", "루모스", "익스펙토 페트로눔"],
+    answer: 1,
+    timeLimit: 12,
+    points: 1000
+  },
+  {
+    id: 4,
+    question: "볼드모트의 본명은 무엇일까요?",
+    imageUrl: "",
+    options: ["톰 마볼로 리들", "겔러트 그린델왈드", "세베루스 스네이프", "시리우스 블랙"],
+    answer: 0,
+    timeLimit: 15,
+    points: 1000
+  }
+];
 
-    let QUIZ_DATA = loadQuizData();
+let QUIZ_DATA = JSON.parse(JSON.stringify(DEFAULT_QUIZ_DATA));
+let isCloudSynced = false;
 
-    function saveQuizDataToStorage() {
-      try {
-        localStorage.setItem('hp_custom_quiz_data', JSON.stringify(QUIZ_DATA));
-        return true;
-      } catch (e) {
-        alert("저장 용량이 초과되었습니다. 너무 큰 이미지 파일 대신 이미지/GIF 인터넷 링크(URL)를 사용해 주세요!");
-        return false;
+// Supabase DB('quiz_settings' 테이블)에서 저장된 퀴즈 불러오기 + 로컬 백업
+async function fetchQuizDataFromServer() {
+  try {
+    // 1. 로컬스토리지 우선 로드 (빠른 초기 표시)
+    const localSaved = localStorage.getItem('hp_custom_quiz_data');
+    if (localSaved) {
+      const parsed = JSON.parse(localSaved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        QUIZ_DATA = parsed;
       }
     }
 
-    const HOUSES = [
-      { id: 'gryffindor', name: '그리핀도르', color: 'house-gryffindor', icon: 'fa-dragon' },
-      { id: 'slytherin', name: '슬리데린', color: 'house-slytherin', icon: 'fa-staff-snake' },
-      { id: 'ravenclaw', name: '래번클로', color: 'house-ravenclaw', icon: 'fa-crow' },
-      { id: 'hufflepuff', name: '후플푸프', color: 'house-hufflepuff', icon: 'fa-dog' }
-    ];
+    // 2. Supabase DB에서 최신 퀴즈 데이터 조회 (어디서든 접속 시 동일 데이터 유지)
+    const { data, error } = await sb
+      .from('quiz_settings')
+      .select('data')
+      .eq('id', 'main_quiz')
+      .maybeSingle();
 
-    // ==========================================
-    // 2. Supabase Realtime 통신 레이어 (Bus)
-    // ==========================================
-    class SupabaseBus {
-      constructor() {
-        this.channel = null;
-        this.listeners = [];
-        this.isSubscribed = false;
-        this.pendingMessages = [];
-      }
-
-      connect(pin, onSubscribed = null) {
-        if (this.channel) sb.removeChannel(this.channel);
-        this.isSubscribed = false;
-        this.pendingMessages = [];
-
-        this.channel = sb.channel('quiz-' + pin, {
-          config: { broadcast: { self: true } }
-        });
-
-        this.channel.on('broadcast', { event: 'quiz-event' }, (payload) => {
-          if (payload && payload.payload) {
-            this.listeners.forEach(cb => cb(payload.payload));
-          }
-        });
-
-        this.channel.subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            this.isSubscribed = true;
-            while (this.pendingMessages.length > 0) {
-              this.send(this.pendingMessages.shift());
-            }
-            if (onSubscribed) onSubscribed();
-          }
-        });
-      }
-
-      onMessage(callback) { this.listeners.push(callback); }
-
-      send(data) {
-        if (!this.isSubscribed || !this.channel) {
-          this.pendingMessages.push(data);
-          return;
-        }
-        this.channel.send({
-          type: 'broadcast',
-          event: 'quiz-event',
-          payload: data
-        });
-      }
-
-      disconnect() {
-        if (this.channel) {
-          sb.removeChannel(this.channel);
-          this.channel = null;
-        }
-        this.isSubscribed = false;
-        this.listeners = [];
-        this.pendingMessages = [];
-      }
+    if (!error && data && Array.isArray(data.data) && data.data.length > 0) {
+      QUIZ_DATA = data.data;
+      localStorage.setItem('hp_custom_quiz_data', JSON.stringify(QUIZ_DATA));
+      isCloudSynced = true;
+    } else if (error) {
+      console.warn("Supabase DB 조회 안내 (테이블 미생성 시 로컬스토리지 작동):", error.message);
     }
+  } catch (e) {
+    console.error("퀴즈 데이터 로드 오류:", e);
+  }
+  return QUIZ_DATA;
+}
 
-    const bus = new SupabaseBus();
+// Supabase DB 및 로컬스토리지에 영구 저장
+async function saveQuizDataToServer(newData) {
+  try {
+    localStorage.setItem('hp_custom_quiz_data', JSON.stringify(newData));
+  } catch (e) {
+    alert("브라우저 로컬 저장 용량이 초과되었습니다. 큰 파일 대신 이미지 인터넷 주소(URL)를 사용해 주세요!");
+    return false;
+  }
 
-    // ==========================================
-    // 3. 앱 상태 관리 및 메인 화면
-    // ==========================================
-    const state = {
-      role: null,
-      pin: null,
-      host: null,
-      player: null
-    };
-
-    function renderScreen(html) {
-      document.getElementById('app').innerHTML = html;
-    }
-
-    function setBadge(text) {
-      document.getElementById('role-badge').innerText = text;
-    }
-
-    function showRoleSelection() {
-      state.role = null;
-      bus.disconnect();
-      QUIZ_DATA = loadQuizData();
-
-      setBadge("역할 선택 필요");
-      renderScreen(`
-        <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full border-2 border-yellow-500/50">
-          <h1 class="text-3xl font-bold mb-2 font-magic text-yellow-400 gold-glow">호그와트 마법 퀴즈</h1>
-          <p class="text-sm text-yellow-200/70 mb-8">접속할 역할을 선택하세요 (총 ${QUIZ_DATA.length}문제 준비됨)</p>
-          
-          <div class="space-y-4">
-            <button onclick="startHost()" class="btn-magic w-full py-4 rounded-xl font-bold text-lg text-yellow-300 flex items-center justify-center space-x-3">
-              <i class="fa-solid fa-crown text-xl text-yellow-400"></i>
-              <span>퀴즈 진행자 (PC / 화면)</span>
-            </button>
-            
-            <button onclick="startPlayerScreen()" class="btn-magic w-full py-4 rounded-xl font-bold text-lg text-yellow-300 flex items-center justify-center space-x-3">
-              <i class="fa-solid fa-wand-magic-sparkles text-xl text-yellow-400"></i>
-              <span>퀴즈 참가자 (스마트폰)</span>
-            </button>
-
-            <div class="pt-4 border-t border-yellow-600/30">
-              <button onclick="openAdminLogin()" class="w-full py-3 rounded-xl font-bold text-sm text-yellow-200/80 bg-yellow-950/50 border border-yellow-600/40 hover:bg-yellow-900/50 flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-gear text-yellow-400"></i>
-                <span>운영자 퀴즈 관리 (문제/사진/점수 수정)</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      `);
-    }
-
-    // ==========================================
-    // 4. 운영자(ADMIN) 퀴즈 편집 페이지 (비밀번호: 1105)
-    // ==========================================
-    let tempQuizList = [];
-
-    function openAdminLogin() {
-      const pw = prompt("운영자 비밀번호를 입력하세요:");
-      if (pw === ADMIN_PASSWORD) {
-        tempQuizList = JSON.parse(JSON.stringify(QUIZ_DATA));
-        renderAdminEditor();
-      } else if (pw !== null) {
-        alert("비밀번호가 올바르지 않습니다.");
-      }
-    }
-
-    function renderAdminEditor() {
-      setBadge("운영자 퀴즈 편집 모드");
-      renderScreen(`
-        <div class="w-full max-w-4xl">
-          <div class="magic-card p-6 rounded-2xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-              <h2 class="text-2xl font-bold text-yellow-400"><i class="fa-solid fa-wand-sparkles mr-2"></i>운영자 퀴즈 설정</h2>
-              <p class="text-xs text-yellow-200/70 mt-1">문제 내용, 사진/움짤(GIF), 배점, 제한시간을 자유롭게 수정할 수 있습니다.</p>
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <button onclick="resetAdminQuizData()" class="px-3 py-2 rounded-lg text-xs bg-red-950/70 border border-red-500/50 text-red-300 hover:bg-red-900/70">
-                초기화
-              </button>
-              <button onclick="showRoleSelection()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 border border-gray-600 text-gray-200 hover:bg-gray-700">
-                취소
-              </button>
-              <button onclick="saveAdminQuizData()" class="btn-magic px-5 py-2 rounded-lg text-sm font-bold text-yellow-300">
-                <i class="fa-solid fa-floppy-disk mr-1"></i>저장 및 적용
-              </button>
-            </div>
-          </div>
-
-          <div class="space-y-6 mb-6">
-            ${tempQuizList.map((q, qIdx) => `
-              <div class="magic-card p-6 rounded-2xl relative border border-yellow-500/40">
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-yellow-600/30">
-                  <span class="font-bold text-lg text-yellow-400">문제 ${qIdx + 1}</span>
-                  <button onclick="deleteAdminQuestion(${qIdx})" class="text-xs px-3 py-1 rounded bg-red-900/60 text-red-200 border border-red-500/40 hover:bg-red-800">
-                    <i class="fa-solid fa-trash mr-1"></i>문제 삭제
-                  </button>
-                </div>
-
-                <!-- 질문 텍스트 -->
-                <div class="mb-4">
-                  <label class="block text-xs text-yellow-300/80 mb-1">질문 내용</label>
-                  <input type="text" value="${escapeHtml(q.question)}" oninput="updateAdminField(${qIdx}, 'question', this.value)"
-                    placeholder="예: 다음 움짤 속 인물이 외치는 주문은?"
-                    class="w-full bg-yellow-950/50 border border-yellow-600/50 rounded-xl px-4 py-2.5 text-yellow-100 focus:outline-none focus:border-yellow-400">
-                </div>
-
-                <!-- 사진 / 움짤(GIF) 설정 -->
-                <div class="mb-4 p-4 rounded-xl bg-black/30 border border-yellow-600/30">
-                  <label class="block text-xs text-yellow-300/90 font-bold mb-2">
-                    <i class="fa-regular fa-image mr-1"></i>사진 / 움짤(GIF) 첨부 (선택사항)
-                  </label>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-                    <div>
-                      <span class="block text-[11px] text-yellow-200/60 mb-1">방법 1: 이미지/GIF 주소(URL) 붙여넣기</span>
-                      <input type="text" value="${escapeHtml(q.imageUrl || '')}" oninput="updateAdminImageUrl(${qIdx}, this.value)"
-                        placeholder="https://... (.jpg, .png, .gif 링크)"
-                        class="w-full bg-yellow-950/50 border border-yellow-600/40 rounded-lg px-3 py-2 text-xs text-yellow-100 focus:outline-none focus:border-yellow-400">
-                    </div>
-                    <div>
-                      <span class="block text-[11px] text-yellow-200/60 mb-1">방법 2: 내 기기에서 사진/GIF 파일 직접 선택</span>
-                      <input type="file" accept="image/*" onchange="handleAdminImageUpload(${qIdx}, this)"
-                        class="w-full text-xs text-yellow-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-yellow-500/50 file:text-xs file:font-bold file:bg-yellow-900/60 file:text-yellow-300 hover:file:bg-yellow-800">
-                    </div>
-                  </div>
-
-                  <!-- 미리보기 -->
-                  <div id="preview-box-${qIdx}" class="mt-3 ${q.imageUrl ? '' : 'hidden'}">
-                    <div class="flex items-center justify-between mb-1">
-                      <span class="text-[11px] text-green-400">미리보기:</span>
-                      <button onclick="clearAdminImage(${qIdx})" class="text-[11px] text-red-400 underline">이미지 지우기</button>
-                    </div>
-                    <img id="preview-img-${qIdx}" src="${q.imageUrl || ''}" alt="미리보기" class="max-h-48 rounded-lg border border-yellow-500/40 mx-auto object-contain bg-black/50">
-                  </div>
-                </div>
-
-                <!-- 4개 선택지 및 정답 체크 -->
-                <div class="mb-4">
-                  <label class="block text-xs text-yellow-300/80 mb-2">선택지 입력 및 정답 선택 (라디오 버튼을 눌러 정답 지정)</label>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    ${q.options.map((opt, oIdx) => `
-                      <div class="flex items-center space-x-2 p-2 rounded-xl border ${q.answer === oIdx ? 'border-green-400 bg-green-950/30' : 'border-yellow-600/30 bg-yellow-950/30'}">
-                        <input type="radio" name="ans-${qIdx}" ${q.answer === oIdx ? 'checked' : ''} onchange="updateAdminAnswer(${qIdx}, ${oIdx})" class="w-4 h-4 accent-green-500 cursor-pointer">
-                        <span class="opt-${oIdx} w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold shrink-0">${['▲','◆','●','■'][oIdx]}</span>
-                        <input type="text" value="${escapeHtml(opt)}" oninput="updateAdminOption(${qIdx}, ${oIdx}, this.value)"
-                          placeholder="보기 ${oIdx + 1}"
-                          class="w-full bg-transparent text-sm text-yellow-100 focus:outline-none">
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-
-                <!-- 점수 및 제한시간 -->
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                  <div>
-                    <label class="block text-xs text-yellow-300/80 mb-1"><i class="fa-solid fa-star text-yellow-400 mr-1"></i>배점 (최대 점수)</label>
-                    <input type="number" min="100" step="100" value="${q.points || 1000}" oninput="updateAdminField(${qIdx}, 'points', Number(this.value))"
-                      class="w-full bg-yellow-950/50 border border-yellow-600/50 rounded-xl px-3 py-2 text-sm text-yellow-100 focus:outline-none focus:border-yellow-400">
-                  </div>
-                  <div>
-                    <label class="block text-xs text-yellow-300/80 mb-1"><i class="fa-solid fa-clock text-yellow-400 mr-1"></i>제한 시간 (초)</label>
-                    <input type="number" min="5" max="120" value="${q.timeLimit || 15}" oninput="updateAdminField(${qIdx}, 'timeLimit', Number(this.value))"
-                      class="w-full bg-yellow-950/50 border border-yellow-600/50 rounded-xl px-3 py-2 text-sm text-yellow-100 focus:outline-none focus:border-yellow-400">
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-
-          <div class="flex flex-col md:flex-row gap-3 justify-between items-center mb-10">
-            <button onclick="addAdminQuestion()" class="w-full md:w-auto px-6 py-3 rounded-xl font-bold text-sm text-yellow-300 bg-yellow-900/40 border border-dashed border-yellow-500 hover:bg-yellow-900/70">
-              <i class="fa-solid fa-plus mr-2"></i>새 문제 추가하기
-            </button>
-            <button onclick="saveAdminQuizData()" class="w-full md:w-auto btn-magic px-8 py-3 rounded-xl font-bold text-base text-yellow-300">
-              <i class="fa-solid fa-check mr-2"></i>모든 변경사항 저장하기
-            </button>
-          </div>
-        </div>
-      `);
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    function updateAdminField(qIdx, field, value) {
-      tempQuizList[qIdx][field] = value;
-    }
-
-    function updateAdminOption(qIdx, oIdx, value) {
-      tempQuizList[qIdx].options[oIdx] = value;
-    }
-
-    function updateAdminAnswer(qIdx, oIdx) {
-      tempQuizList[qIdx].answer = oIdx;
-      renderAdminEditor();
-    }
-
-    function updateAdminImageUrl(qIdx, url) {
-      tempQuizList[qIdx].imageUrl = url.trim();
-      const box = document.getElementById(`preview-box-${qIdx}`);
-      const img = document.getElementById(`preview-img-${qIdx}`);
-      if (url.trim()) {
-        img.src = url.trim();
-        box.classList.remove('hidden');
-      } else {
-        box.classList.add('hidden');
-      }
-    }
-
-    function handleAdminImageUpload(qIdx, input) {
-      const file = input.files[0];
-      if (!file) return;
-      if (file.size > 2.5 * 1024 * 1024) {
-        alert("파일 크기가 2.5MB를 초과합니다. 움짤(GIF)이나 고화질 사진은 인터넷 이미지 주소(URL)를 붙여넣는 것을 권장합니다.");
-      }
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        tempQuizList[qIdx].imageUrl = e.target.result;
-        renderAdminEditor();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function clearAdminImage(qIdx) {
-      tempQuizList[qIdx].imageUrl = "";
-      renderAdminEditor();
-    }
-
-    function addAdminQuestion() {
-      tempQuizList.push({
-        id: Date.now(),
-        question: "새로운 마법 문제를 입력하세요",
-        imageUrl: "",
-        options: ["보기 1", "보기 2", "보기 3", "보기 4"],
-        answer: 0,
-        timeLimit: 15,
-        points: 1000
+  try {
+    const { error } = await sb
+      .from('quiz_settings')
+      .upsert({
+        id: 'main_quiz',
+        data: newData,
+        updated_at: new Date().toISOString()
       });
-      renderAdminEditor();
-    }
 
-    function deleteAdminQuestion(qIdx) {
-      if (tempQuizList.length <= 1) {
-        alert("최소 1개 이상의 문제가 필요합니다.");
-        return;
-      }
-      if (confirm(`문제 ${qIdx + 1}번을 삭제하시겠습니까?`)) {
-        tempQuizList.splice(qIdx, 1);
-        renderAdminEditor();
-      }
+    if (error) {
+      console.warn("Supabase DB 저장 실패:", error.message);
+      alert("⚠️ 현재 브라우저에는 저장되었으나, 클라우드 DB(quiz_settings 테이블)에 접근할 수 없어 다른 기기에서는 반영되지 않을 수 있습니다.\n\n(Supabase SQL Editor에서 quiz_settings 테이블을 생성하면 모든 기기에서 영구 동기화됩니다!)");
+      return true;
     }
+    isCloudSynced = true;
+    return true;
+  } catch (e) {
+    console.error(e);
+    return true;
+  }
+}
 
-    function resetAdminQuizData() {
-      if (confirm("모든 문제를 초기 기본값으로 되돌리시겠습니까?")) {
-        tempQuizList = JSON.parse(JSON.stringify(DEFAULT_QUIZ_DATA));
-        renderAdminEditor();
+const HOUSES = [
+  { id: 'gryffindor', name: '그리핀도르', color: 'house-gryffindor', icon: 'fa-dragon' },
+  { id: 'slytherin', name: '슬리데린', color: 'house-slytherin', icon: 'fa-staff-snake' },
+  { id: 'ravenclaw', name: '래번클로', color: 'house-ravenclaw', icon: 'fa-crow' },
+  { id: 'hufflepuff', name: '후플푸프', color: 'house-hufflepuff', icon: 'fa-dog' }
+];
+
+// ==========================================
+// 2. Supabase Realtime 통신 레이어 (Bus)
+// ==========================================
+class SupabaseBus {
+  constructor() {
+    this.channel = null;
+    this.listeners = [];
+    this.isSubscribed = false;
+    this.pendingMessages = [];
+  }
+
+  connect(pin, onSubscribed = null) {
+    if (this.channel) sb.removeChannel(this.channel);
+    this.isSubscribed = false;
+    this.pendingMessages = [];
+
+    this.channel = sb.channel('quiz-' + pin, {
+      config: { broadcast: { self: true } }
+    });
+
+    this.channel.on('broadcast', { event: 'quiz-event' }, (payload) => {
+      if (payload && payload.payload) {
+        this.listeners.forEach(cb => cb(payload.payload));
       }
-    }
+    });
 
-    function saveAdminQuizData() {
-      for (let i = 0; i < tempQuizList.length; i++) {
-        const q = tempQuizList[i];
-        if (!q.question.trim()) {
-          alert(`문제 ${i + 1}번의 질문 내용을 입력해 주세요.`);
-          return;
+    this.channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        this.isSubscribed = true;
+        while (this.pendingMessages.length > 0) {
+          this.send(this.pendingMessages.shift());
         }
-        if (q.options.some(opt => !opt.trim())) {
-          alert(`문제 ${i + 1}번의 4개 선택지를 모두 입력해 주세요.`);
-          return;
-        }
-        if (!q.points || q.points <= 0) q.points = 1000;
-        if (!q.timeLimit || q.timeLimit < 3) q.timeLimit = 15;
+        if (onSubscribed) onSubscribed();
       }
+    });
+  }
 
-      QUIZ_DATA = JSON.parse(JSON.stringify(tempQuizList));
-      if (saveQuizDataToStorage()) {
-        alert("퀴즈 설정이 성공적으로 저장되었습니다!");
-        showRoleSelection();
-      }
+  onMessage(callback) {
+    this.listeners.push(callback);
+  }
+
+  send(data) {
+    if (!this.isSubscribed || !this.channel) {
+      this.pendingMessages.push(data);
+      return;
     }
+    this.channel.send({
+      type: 'broadcast',
+      event: 'quiz-event',
+      payload: data
+    });
+  }
 
-    // ==========================================
-    // 5. HOST (진행자) 로직
-    // ==========================================
-    class HostController {
-      constructor() {
-        this.pin = Math.floor(100000 + Math.random() * 900000).toString();
-        this.players = new Map();
-        this.currentQIndex = -1;
-        this.state = 'LOBBY';
-        this.timer = null;
-        this.timeLeft = 0;
-        this.questionStartTime = 0;
+  disconnect() {
+    if (this.channel) {
+      sb.removeChannel(this.channel);
+      this.channel = null;
+      this.isSubscribed = false;
+      this.listeners = [];
+      this.pendingMessages = [];
+    }
+  }
+}
 
-        bus.connect(this.pin, () => {
-          console.log(`[Host] Supabase Realtime connected on PIN: ${this.pin}`);
-        });
+const bus = new SupabaseBus();
 
-        bus.onMessage((msg) => this.handleMessage(msg));
-      }
+// ==========================================
+// 3. 앱 상태 관리 및 메인 화면
+// ==========================================
+const state = {
+  role: null,
+  pin: null,
+  host: null,
+  player: null
+};
 
-      handleMessage(msg) {
-        if (msg.type === 'JOIN') {
-          const { playerId, nickname, house } = msg;
-          
-          let player = this.players.get(playerId);
-          if (!player) {
-            player = { id: playerId, nickname, house, score: 0, lastAnswer: null };
-            this.players.set(playerId, player);
-          } else {
-            player.nickname = nickname;
-            player.house = house;
-          }
+function renderScreen(html) {
+  document.getElementById('app').innerHTML = html;
+}
 
-          bus.send({
-            type: 'JOIN_RESULT',
-            targetId: playerId,
-            success: true,
-            gameState: this.state
-          });
+function setBadge(text) {
+  document.getElementById('role-badge').innerText = text;
+}
 
-          this.renderLobby();
-        } else if (msg.type === 'ANSWER') {
-          if (this.state !== 'QUESTION') return;
-          const { playerId, answerIndex } = msg;
-          const player = this.players.get(playerId);
-          
-          if (player && player.lastAnswer === null) {
-            const now = Date.now();
-            const timeTaken = (now - this.questionStartTime) / 1000;
-            const q = QUIZ_DATA[this.currentQIndex];
+async function showRoleSelection() {
+  state.role = null;
+  bus.disconnect();
+  setBadge("퀴즈 불러오는 중...");
 
-            player.lastAnswer = answerIndex;
+  renderScreen(`
+    <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
+      <i class="fa-solid fa-wand-sparkles fa-spin text-3xl text-yellow-400 mb-4"></i>
+      <p class="text-sm text-yellow-200/80">마법 양피지에서 문제를 불러오는 중입니다...</p>
+    </div>
+  `);
 
-            if (answerIndex === q.answer) {
-              const maxPoints = q.points || 1000;
-              const basePoints = Math.round(maxPoints * 0.5);
-              const bonusPoints = maxPoints - basePoints;
-              const remainingRatio = Math.max(0, (q.timeLimit - timeTaken) / q.timeLimit);
-              const scoreGained = Math.round(basePoints + (bonusPoints * remainingRatio));
-              player.score += scoreGained;
-            }
+  await fetchQuizDataFromServer();
+  setBadge("역할 선택 필요");
 
-            this.updateSubmittedCount();
-          }
+  renderScreen(`
+    <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full border-2 border-yellow-500/50">
+      <h1 class="text-3xl font-bold mb-2 font-magic text-yellow-400 gold-glow">호그와트 마법 퀴즈</h1>
+      <p class="text-sm text-yellow-200/70 mb-2">접속할 역할을 선택하세요 (총 ${QUIZ_DATA.length}문제 준비됨)</p>
+      <div class="mb-6">
+        ${isCloudSynced
+          ? '<span class="text-[11px] px-2.5 py-0.5 rounded-full bg-green-950/70 border border-green-500/50 text-green-300"><i class="fa-solid fa-cloud-check mr-1"></i>클라우드 퀴즈 동기화 완료</span>'
+          : '<span class="text-[11px] px-2.5 py-0.5 rounded-full bg-yellow-950/70 border border-yellow-500/40 text-yellow-300/80"><i class="fa-solid fa-database mr-1"></i>기본/로컬 퀴즈 모드</span>'
         }
-      }
+      </div>
+      <div class="space-y-4">
+        <button onclick="startHost()" class="btn-magic w-full py-4 rounded-xl font-bold text-lg text-yellow-300 flex items-center justify-center space-x-3">
+          <i class="fa-solid fa-crown text-xl text-yellow-400"></i>
+          <span>퀴즈 진행자 (PC/화면)</span>
+        </button>
+        <button onclick="startPlayerScreen()" class="btn-magic w-full py-4 rounded-xl font-bold text-lg text-yellow-300 flex items-center justify-center space-x-3">
+          <i class="fa-solid fa-wand-magic-sparkles text-xl text-yellow-400"></i>
+          <span>퀴즈 참가자 (스마트폰)</span>
+        </button>
+        <div class="pt-4 border-t border-yellow-600/30">
+          <button onclick="openAdminLogin()" class="w-full py-3 rounded-xl font-bold text-sm text-yellow-200/80 bg-yellow-950/50 border border-yellow-600/40 hover:bg-yellow-900/50 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-gear text-yellow-400"></i>
+            <span>운영자 퀴즈 관리 (문제/사진/점수 수정)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `);
+}
 
-      renderLobby() {
-        setBadge(`진행자 | PIN: ${this.pin}`);
-        const playerList = Array.from(this.players.values());
+// ==========================================
+// 4. 운영자(ADMIN) 퀴즈 편집 페이지 (비밀번호: 1105)
+// ==========================================
+let tempQuizList = [];
 
-        renderScreen(`
-          <div class="w-full max-w-3xl flex flex-col items-center">
-            <div class="magic-card p-6 rounded-2xl w-full text-center mb-6 relative">
-              <button onclick="openChairmanPrompt()" class="absolute top-4 right-4 text-xs px-3 py-1 border border-yellow-500/50 bg-yellow-950/60 rounded-full text-yellow-300 hover:bg-yellow-800/60">
-                <i class="fa-solid fa-key mr-1"></i>위원장 모드
+function openAdminLogin() {
+  const pw = prompt("운영자 비밀번호를 입력하세요:");
+  if (pw === ADMIN_PASSWORD) {
+    tempQuizList = JSON.parse(JSON.stringify(QUIZ_DATA));
+    renderAdminEditor();
+  } else if (pw !== null) {
+    alert("비밀번호가 올바르지 않습니다.");
+  }
+}
+
+function renderAdminEditor() {
+  setBadge("운영자 퀴즈 편집 모드");
+  renderScreen(`
+    <div class="w-full max-w-4xl">
+      <div class="magic-card p-6 rounded-2xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-yellow-400"><i class="fa-solid fa-wand-sparkles mr-2"></i>운영자 퀴즈 설정</h2>
+          <p class="text-xs text-yellow-200/70 mt-1">저장 시 클라우드 서버에 반영되어 어떤 기기나 주소로 접속해도 동일한 문제가 출제됩니다.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="resetAdminQuizData()" class="px-3 py-2 rounded-lg text-xs bg-red-950/70 border border-red-500/50 text-red-300 hover:bg-red-900/70">
+            초기화
+          </button>
+          <button onclick="showRoleSelection()" class="px-4 py-2 rounded-lg text-sm bg-gray-800 border border-gray-600 text-gray-200 hover:bg-gray-700">
+            취소
+          </button>
+          <button onclick="saveAdminQuizData()" class="btn-magic px-5 py-2 rounded-lg text-sm font-bold text-yellow-300">
+            <i class="fa-solid fa-floppy-disk mr-1"></i>저장 및 적용
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-6 mb-6">
+        ${tempQuizList.map((q, qIdx) => `
+          <div class="magic-card p-6 rounded-2xl relative border border-yellow-500/40">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-yellow-600/30">
+              <span class="font-bold text-lg text-yellow-400">문제 ${qIdx + 1}</span>
+              <button onclick="deleteAdminQuestion(${qIdx})" class="text-xs px-3 py-1 rounded bg-red-900/60 text-red-200 border border-red-500/40 hover:bg-red-800">
+                <i class="fa-solid fa-trash mr-1"></i>문제 삭제
               </button>
-              <span class="text-sm text-yellow-300/70">참가 PIN 번호</span>
-              <div class="text-5xl font-black font-magic text-yellow-400 tracking-widest my-2 gold-glow">${this.pin}</div>
-              <p class="text-xs text-yellow-200/60">참가자는 스마트폰에서 위 PIN 번호를 입력하세요</p>
             </div>
 
-            <div class="w-full mb-6">
-              <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-yellow-300">접속한 학생들 (${playerList.length}명)</h2>
-                <button onclick="hostAddBot()" class="text-xs px-3 py-1 bg-yellow-900/50 border border-yellow-600 rounded text-yellow-300 hover:bg-yellow-800/50">
-                  + 가상 봇 추가
-                </button>
-              </div>
-
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                ${playerList.map(p => {
-                  const h = HOUSES.find(x => x.id === p.house) || HOUSES[0];
-                  return `
-                    <div class="p-3 rounded-xl border ${h.color} flex items-center space-x-3 shadow-md">
-                      <i class="fa-solid ${h.icon} text-lg"></i>
-                      <div class="truncate">
-                        <div class="font-bold text-sm truncate">${p.nickname}</div>
-                        <div class="text-xs opacity-75">${h.name}</div>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-                ${playerList.length === 0 ? `<div class="col-span-full text-center py-8 text-yellow-500/50">학생들이 입장을 기다리고 있습니다...</div>` : ''}
-              </div>
+            <!-- 질문 텍스트 -->
+            <div class="mb-4">
+              <label class="block text-xs text-yellow-300/80 mb-1">질문 내용</label>
+              <input type="text" value="${escapeHtml(q.question)}"
+                oninput="updateAdminField(${qIdx}, 'question', this.value)"
+                placeholder="예: 다음 움짤 속 인물이 외치는 주문은?"
+                class="w-full bg-yellow-950/50 border border-yellow-600/50 rounded-xl px-4 py-2.5 text-yellow-100 focus:outline-none focus:border-yellow-400">
             </div>
 
-            <button onclick="host.nextQuestion()" ${playerList.length === 0 ? 'disabled class="opacity-50 btn-magic px-8 py-4 rounded-xl font-bold text-lg text-yellow-300 cursor-not-allowed"' : 'class="btn-magic px-8 py-4 rounded-xl font-bold text-lg text-yellow-300"'}>
-              퀴즈 시작하기 ⚡ (총 ${QUIZ_DATA.length}문제)
-            </button>
-          </div>
-        `);
-      }
-
-      nextQuestion() {
-        this.currentQIndex++;
-        if (this.currentQIndex >= QUIZ_DATA.length) {
-          this.endGame();
-          return;
-        }
-
-        this.players.forEach(p => p.lastAnswer = null);
-
-        const q = QUIZ_DATA[this.currentQIndex];
-        this.state = 'QUESTION';
-        this.timeLeft = q.timeLimit;
-        this.questionStartTime = Date.now();
-
-        bus.send({
-          type: 'QUESTION',
-          questionIndex: this.currentQIndex,
-          totalQuestions: QUIZ_DATA.length,
-          question: q.question,
-          options: q.options,
-          timeLimit: q.timeLimit
-        });
-
-        this.renderQuestionView();
-        this.startTimer();
-      }
-
-      startTimer() {
-        if (this.timer) clearInterval(this.timer);
-        this.timer = setInterval(() => {
-          this.timeLeft--;
-          const timerEl = document.getElementById('host-timer');
-          if (timerEl) timerEl.innerText = this.timeLeft;
-
-          if (this.timeLeft <= 0) {
-            clearInterval(this.timer);
-            this.revealAnswer();
-          }
-        }, 1000);
-      }
-
-      updateSubmittedCount() {
-        const submitted = Array.from(this.players.values()).filter(p => p.lastAnswer !== null).length;
-        const total = this.players.size;
-        const el = document.getElementById('submitted-count');
-        if (el) el.innerText = `${submitted} / ${total}`;
-
-        if (submitted >= total && total > 0) {
-          if (this.timer) clearInterval(this.timer);
-          this.revealAnswer();
-        }
-      }
-
-      renderQuestionView() {
-        const q = QUIZ_DATA[this.currentQIndex];
-        const hasMedia = q.imageUrl && q.imageUrl.trim() !== '';
-
-        renderScreen(`
-          <div class="w-full max-w-3xl flex flex-col items-center">
-            <div class="flex justify-between items-center w-full mb-4 px-2">
-              <div class="flex items-center space-x-3">
-                <span class="text-yellow-400 font-bold">Q ${this.currentQIndex + 1} / ${QUIZ_DATA.length}</span>
-                <span class="text-xs px-2.5 py-0.5 rounded-full bg-yellow-900/60 border border-yellow-500/40 text-yellow-300">
-                  배점: ${q.points || 1000}점
-                </span>
-              </div>
-              <div class="text-2xl font-black text-yellow-400 bg-yellow-950/60 border border-yellow-500/40 px-4 py-1 rounded-full">
-                ⏳ <span id="host-timer">${this.timeLeft}</span>초
-              </div>
-            </div>
-
-            <div class="magic-card p-6 md:p-8 rounded-2xl w-full text-center mb-6">
-              <h2 class="text-2xl md:text-3xl font-bold text-yellow-200 ${hasMedia ? 'mb-5' : ''}">${q.question}</h2>
-              ${hasMedia ? `
-                <div class="flex justify-center">
-                  <img src="${q.imageUrl}" alt="문제 이미지" class="max-h-64 md:max-h-80 rounded-xl border-2 border-yellow-500/50 shadow-lg object-contain bg-black/40">
+            <!-- 사진/움짤(GIF) 설정 -->
+            <div class="mb-4 p-4 rounded-xl bg-black/30 border border-yellow-600/30">
+              <label class="block text-xs text-yellow-300/90 font-bold mb-2">
+                <i class="fa-regular fa-image mr-1"></i> 사진/움짤(GIF) 첨부 (선택사항)
+              </label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+                <div>
+                  <span class="block text-[11px] text-yellow-200/60 mb-1">방법 1: 이미지/GIF 주소(URL) 붙여넣기 (권장)</span>
+                  <input type="text" value="${escapeHtml(q.imageUrl || '')}"
+                    oninput="updateAdminImageUrl(${qIdx}, this.value)"
+                    placeholder="https://... (.jpg, .png, .gif 링크)"
+                    class="w-full bg-yellow-950/50 border border-yellow-600/40 rounded-lg px-3 py-2 text-xs text-yellow-100 focus:outline-none focus:border-yellow-400">
                 </div>
-              ` : ''}
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 w-full mb-6">
-              ${q.options.map((opt, i) => `
-                <div class="opt-${i} p-4 rounded-xl text-white font-bold text-center text-lg shadow-lg flex items-center justify-center min-h-[70px]">
-                  <span class="mr-2 opacity-80">${['▲','◆','●','■'][i]}</span> ${opt}
+                <div>
+                  <span class="block text-[11px] text-yellow-200/60 mb-1">방법 2: 내 기기에서 사진/GIF 파일 직접 선택</span>
+                  <input type="file" accept="image/*"
+                    onchange="handleAdminImageUpload(${qIdx}, this)"
+                    class="w-full text-xs text-yellow-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-yellow-500/50 file:text-xs file:font-bold file:bg-yellow-900/60 file:text-yellow-300 hover:file:bg-yellow-800">
                 </div>
-              `).join('')}
-            </div>
+              </div>
 
-            <div class="text-sm text-yellow-300/80 mb-4">
-              제출 완료: <span id="submitted-count" class="font-bold text-yellow-400">0 / ${this.players.size}</span>
-            </div>
-
-            <button onclick="host.revealAnswer()" class="text-xs text-yellow-400/60 underline hover:text-yellow-300">
-              바로 결과 공개
-            </button>
-          </div>
-        `);
-      }
-
-      revealAnswer() {
-        if (this.timer) clearInterval(this.timer);
-        this.state = 'REVEAL';
-
-        const q = QUIZ_DATA[this.currentQIndex];
-
-        bus.send({
-          type: 'REVEAL',
-          correctAnswer: q.answer,
-          scores: Array.from(this.players.values()).map(p => ({
-            id: p.id,
-            score: p.score,
-            isCorrect: p.lastAnswer === q.answer
-          }))
-        });
-
-        this.renderRevealView();
-      }
-
-      renderRevealView() {
-        const q = QUIZ_DATA[this.currentQIndex];
-        const sortedPlayers = Array.from(this.players.values())
-          .sort((a, b) => b.score - a.score);
-
-        renderScreen(`
-          <div class="w-full max-w-3xl flex flex-col items-center">
-            <h2 class="text-xl font-bold text-yellow-400 mb-2">정답 공개</h2>
-            <div class="opt-${q.answer} p-4 rounded-xl text-white font-bold text-center text-xl shadow-lg w-full mb-6">
-              정답: ${q.options[q.answer]}
-            </div>
-
-            <div class="magic-card p-6 rounded-2xl w-full mb-6">
-              <h3 class="text-lg font-bold text-yellow-300 mb-4 border-b border-yellow-600/30 pb-2">중간 순위</h3>
-              <div class="space-y-2 max-h-60 overflow-y-auto pr-2">
-                ${sortedPlayers.map((p, idx) => {
-                  const h = HOUSES.find(x => x.id === p.house) || HOUSES[0];
-                  return `
-                    <div class="flex items-center justify-between p-2 rounded-lg bg-yellow-950/30 border border-yellow-600/20">
-                      <div class="flex items-center space-x-3">
-                        <span class="font-bold text-yellow-500 w-6">${idx + 1}</span>
-                        <span class="font-bold text-yellow-200">${p.nickname}</span>
-                        <span class="text-xs px-2 py-0.5 rounded ${h.color}">${h.name}</span>
-                      </div>
-                      <span class="font-black text-yellow-400">${p.score} pts</span>
-                    </div>
-                  `;
-                }).join('')}
+              <!-- 미리보기 -->
+              <div id="preview-box-${qIdx}" class="mt-3 ${q.imageUrl ? '' : 'hidden'}">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[11px] text-green-400">미리보기:</span>
+                  <button onclick="clearAdminImage(${qIdx})" class="text-[11px] text-red-400 underline">이미지 지우기</button>
+                </div>
+                <img id="preview-img-${qIdx}" src="${q.imageUrl || ''}" alt="미리보기"
+                  class="max-h-48 rounded-lg border border-yellow-500/40 mx-auto object-contain bg-black/50">
               </div>
             </div>
 
-            <button onclick="host.nextQuestion()" class="btn-magic px-8 py-4 rounded-xl font-bold text-lg text-yellow-300">
-              ${this.currentQIndex + 1 < QUIZ_DATA.length ? '다음 문제 ⚡' : '최종 결과 보기 🏆'}
-            </button>
-          </div>
-        `);
-      }
-
-      endGame() {
-        this.state = 'END';
-        bus.send({ type: 'GAME_OVER' });
-
-        const sorted = Array.from(this.players.values()).sort((a, b) => b.score - a.score);
-        const winner = sorted[0];
-
-        renderScreen(`
-          <div class="w-full max-w-xl text-center">
-            <h1 class="text-4xl font-black font-magic text-yellow-400 gold-glow mb-2">최종 결과</h1>
-            <p class="text-yellow-200/70 mb-8">호그와트 기말고사 우승자</p>
-
-            ${winner ? `
-              <div class="magic-card p-8 rounded-2xl mb-8 border-2 border-yellow-400 gold-glow">
-                <i class="fa-solid fa-trophy text-5xl text-yellow-400 mb-4"></i>
-                <div class="text-3xl font-black text-yellow-300 mb-1">${winner.nickname}</div>
-                <div class="text-sm text-yellow-200/80 mb-3">${(HOUSES.find(h=>h.id===winner.house)||{}).name || ''}</div>
-                <div class="text-2xl font-bold text-yellow-400">${winner.score} pts</div>
-              </div>
-            ` : ''}
-
-            <button onclick="showRoleSelection()" class="btn-magic px-8 py-3 rounded-xl font-bold text-yellow-300">
-              메인 화면으로 돌아가기
-            </button>
-          </div>
-        `);
-      }
-    }
-
-    let host = null;
-
-    function startHost() {
-      state.role = 'host';
-      state.host = new HostController();
-      host = state.host;
-      state.host.renderLobby();
-    }
-
-    function hostAddBot() {
-      if (!state.host) return;
-      const botNames = ['해리', '론', '헤르미온느', '말포이', '네빌', '루나'];
-      const randomName = botNames[Math.floor(Math.random() * botNames.length)] + Math.floor(Math.random()*100);
-      const randomHouse = HOUSES[Math.floor(Math.random() * HOUSES.length)].id;
-      const botId = 'bot-' + Math.random().toString(36).substr(2, 9);
-
-      state.host.handleMessage({
-        type: 'JOIN',
-        playerId: botId,
-        nickname: randomName,
-        house: randomHouse
-      });
-    }
-
-    // ==========================================
-    // 6. PLAYER (참가자) 로직
-    // ==========================================
-    class PlayerController {
-      constructor() {
-        let savedId = localStorage.getItem('hp_quiz_player_id');
-        if (!savedId) {
-          savedId = 'player-' + Math.random().toString(36).substr(2, 9);
-          localStorage.setItem('hp_quiz_player_id', savedId);
-        }
-        this.id = savedId;
-
-        this.nickname = '';
-        this.house = HOUSES[0].id;
-        this.pin = '';
-        this.myScore = 0;
-        this.selectedAnswer = null;
-        this.hasAnswered = false;
-      }
-
-      joinGame(pin, nickname, house) {
-        this.pin = pin;
-        this.nickname = nickname;
-        this.house = house;
-
-        bus.connect(this.pin, () => {
-          bus.send({
-            type: 'JOIN',
-            playerId: this.id,
-            nickname: this.nickname,
-            house: this.house
-          });
-        });
-
-        bus.onMessage((msg) => this.handleMessage(msg));
-
-        renderScreen(`
-          <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
-            <i class="fa-solid fa-spinner fa-spin text-3xl text-yellow-400 mb-4"></i>
-            <h2 class="text-xl font-bold text-yellow-300 mb-2">호그와트 연결 중...</h2>
-            <p class="text-xs text-yellow-200/60">진행자가 게임을 시작할 때까지 기다려주세요.</p>
-          </div>
-        `);
-      }
-
-      handleMessage(msg) {
-        if (msg.type === 'JOIN_RESULT') {
-          if (msg.targetId === this.id && msg.success) {
-            this.renderWaitingView();
-          }
-        } else if (msg.type === 'QUESTION') {
-          this.selectedAnswer = null;
-          this.hasAnswered = false;
-          this.renderQuestionView(msg);
-        } else if (msg.type === 'REVEAL') {
-          const myResult = msg.scores.find(s => s.id === this.id);
-          if (myResult) {
-            this.myScore = myResult.score;
-          }
-          this.renderResultView(msg.correctAnswer, myResult ? myResult.isCorrect : false);
-        } else if (msg.type === 'GAME_OVER') {
-          this.renderGameOverView();
-        } else if (msg.type === 'RESET') {
-          showRoleSelection();
-        }
-      }
-
-      renderWaitingView() {
-        const h = HOUSES.find(x => x.id === this.house) || HOUSES[0];
-        setBadge(`참가자 | ${this.nickname}`);
-
-        renderScreen(`
-          <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
-            <div class="inline-block p-4 rounded-full ${h.color} mb-4">
-              <i class="fa-solid ${h.icon} text-3xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-yellow-300 mb-1">${this.nickname}</h2>
-            <p class="text-sm text-yellow-200/70 mb-6">${h.name} 기숙사</p>
-
-            <div class="p-4 rounded-xl bg-yellow-950/40 border border-yellow-600/30 text-yellow-400 animate-pulse text-sm">
-              진행자가 문제를 내기를 기다리고 있습니다...
-            </div>
-          </div>
-        `);
-      }
-
-      sendAnswer(index) {
-        if (this.hasAnswered) return;
-        this.selectedAnswer = index;
-        this.hasAnswered = true;
-
-        bus.send({
-          type: 'ANSWER',
-          playerId: this.id,
-          answerIndex: index
-        });
-
-        this.renderAnswerSubmittedView();
-      }
-
-      renderQuestionView(qMsg) {
-        renderScreen(`
-          <div class="w-full max-w-md flex flex-col items-center">
-            <div class="flex justify-between items-center w-full mb-4 px-2">
-              <span class="text-xs text-yellow-400">Q ${qMsg.questionIndex + 1} / ${qMsg.totalQuestions}</span>
-              <span class="text-xs text-yellow-300 font-bold">내 점수: ${this.myScore}</span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 w-full h-64">
-              ${qMsg.options.map((_, idx) => `
-                <button onclick="player.sendAnswer(${idx})" class="opt-${idx} rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-lg active:scale-95 transition-transform">
-                  ${['▲', '◆', '●', '■'][idx]}
-                </button>
-              `).join('')}
-            </div>
-          </div>
-        `);
-      }
-
-      renderAnswerSubmittedView() {
-        renderScreen(`
-          <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
-            <i class="fa-solid fa-paper-plane text-4xl text-yellow-400 mb-4 animate-bounce"></i>
-            <h2 class="text-2xl font-bold text-yellow-300 mb-2">답안 제출 완료!</h2>
-            <p class="text-xs text-yellow-200/60">다른 학생들의 제출을 기다리는 중입니다.</p>
-          </div>
-        `);
-      }
-
-      renderResultView(correctAnswer, isCorrect) {
-        renderScreen(`
-          <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
-            <div class="text-5xl mb-4">
-              ${isCorrect ? '⭕' : '❌'}
-            </div>
-            <h2 class="text-2xl font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'} mb-2">
-              ${isCorrect ? '정답입니다!' : '틀렸습니다...'}
-            </h2>
-            <div class="text-lg text-yellow-300 font-bold mb-6">
-              현재 점수: ${this.myScore} pts
-            </div>
-            <p class="text-xs text-yellow-200/60">다음 문제를 기다려주세요</p>
-          </div>
-        `);
-      }
-
-      renderGameOverView() {
-        renderScreen(`
-          <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
-            <i class="fa-solid fa-award text-5xl text-yellow-400 mb-4 gold-glow"></i>
-            <h2 class="text-3xl font-bold font-magic text-yellow-400 mb-2">퀴즈 종료!</h2>
-            <p class="text-sm text-yellow-200/70 mb-4">최종 점수</p>
-            <div class="text-4xl font-black text-yellow-300 gold-glow mb-6">${this.myScore} pts</div>
-
-            <button onclick="showRoleSelection()" class="btn-magic px-6 py-3 rounded-xl font-bold text-yellow-300 text-sm">
-              메인 화면으로
-            </button>
-          </div>
-        `);
-      }
-    }
-
-    let player = null;
-
-    function startPlayerScreen() {
-      state.role = 'player';
-      player = new PlayerController();
-
-      setBadge("참가자 설정");
-      renderScreen(`
-        <div class="magic-card p-8 rounded-2xl max-w-md w-full">
-          <h2 class="text-2xl font-bold text-center text-yellow-400 font-magic mb-6">학생 등록</h2>
-
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs text-yellow-300/80 mb-1">PIN 번호 6자리</label>
-              <input id="join-pin" type="text" maxlength="6" placeholder="예: 123456" class="w-full bg-yellow-950/40 border border-yellow-600/50 rounded-xl px-4 py-3 text-yellow-200 placeholder-yellow-700/50 focus:outline-none focus:border-yellow-400 text-center text-xl font-bold tracking-widest">
-            </div>
-
-            <div>
-              <label class="block text-xs text-yellow-300/80 mb-1">이름 / 닉네임</label>
-              <input id="join-name" type="text" placeholder="이름을 입력하세요" class="w-full bg-yellow-950/40 border border-yellow-600/50 rounded-xl px-4 py-3 text-yellow-200 placeholder-yellow-700/50 focus:outline-none focus:border-yellow-400">
-            </div>
-
-            <div>
-              <label class="block text-xs text-yellow-300/80 mb-1">기숙사 선택</label>
-              <div class="grid grid-cols-2 gap-2">
-                ${HOUSES.map((h, idx) => `
-                  <label class="cursor-pointer">
-                    <input type="radio" name="house" value="${h.id}" ${idx===0?'checked':''} class="peer hidden">
-                    <div class="p-3 rounded-xl border border-yellow-600/30 peer-checked:border-yellow-400 peer-checked:bg-yellow-900/40 flex items-center space-x-2 text-sm text-yellow-200">
-                      <i class="fa-solid ${h.icon}"></i>
-                      <span>${h.name}</span>
-                    </div>
-                  </label>
+            <!-- 4개 선택지 및 정답 체크 -->
+            <div class="mb-4">
+              <label class="block text-xs text-yellow-300/80 mb-2">선택지 입력 및 정답 선택 (라디오 버튼을 눌러 정답 지정)</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                ${q.options.map((opt, oIdx) => `
+                  <div class="flex items-center space-x-2 p-2 rounded-xl border ${q.answer === oIdx ? 'border-green-400 bg-green-950/30' : 'border-yellow-600/30 bg-yellow-950/30'}">
+                    <input type="radio" name="ans-${qIdx}" ${q.answer === oIdx ? 'checked' : ''}
+                      onchange="updateAdminAnswer(${qIdx}, ${oIdx})"
+                      class="w-4 h-4 accent-green-500 cursor-pointer">
+                    <span class="opt-${oIdx} w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      ${['▲', '◆', '●', '■'][oIdx]}
+                    </span>
+                    <input type="text" value="${escapeHtml(opt)}"
+                      oninput="updateAdminOption(${qIdx}, ${oIdx}, this.value)"
+                      placeholder="보기 ${oIdx + 1}"
+                      class="w-full bg-transparent text-sm text-yellow-100 focus:outline-none">
+                  </div>
                 `).join('')}
               </div>
             </div>
 
-            <button onclick="submitJoin()" class="btn-magic w-full py-4 rounded-xl font-bold text-yellow-300 text-lg mt-4">
-              입장하기 ⚡
+            <!-- 점수 및 제한시간 -->
+            <div class="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <label class="block text-xs text-yellow-300/80 mb-1"><i class="fa-solid fa-star text-yellow-400 mr-1"></i>배점 (최대 점수)</label>
+                <input type="number" min="100" step="100" value="${q.points || 1000}"
+                  oninput="updateAdminField(${qIdx}, 'points', Number(this.value))"
+                  class="w-full bg-yellow-950/50 border border-yellow-600/50 rounded-xl px-3 py-2 text-sm text-yellow-100 focus:outline-none focus:border-yellow-400">
+              </div>
+              <div>
+                <label class="block text-xs text-yellow-300/80 mb-1"><i class="fa-solid fa-clock text-yellow-400 mr-1"></i>제한 시간 (초)</label>
+                <input type="number" min="5" max="120" value="${q.timeLimit || 15}"
+                  oninput="updateAdminField(${qIdx}, 'timeLimit', Number(this.value))"
+                  class="w-full bg-yellow-950/50 border border-yellow-600/50 rounded-xl px-3 py-2 text-sm text-yellow-100 focus:outline-none focus:border-yellow-400">
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="flex flex-col md:flex-row gap-3 justify-between items-center mb-10">
+        <button onclick="addAdminQuestion()" class="w-full md:w-auto px-6 py-3 rounded-xl font-bold text-sm text-yellow-300 bg-yellow-900/40 border border-dashed border-yellow-500 hover:bg-yellow-900/70">
+          <i class="fa-solid fa-plus mr-2"></i>새 문제 추가하기
+        </button>
+        <button onclick="saveAdminQuizData()" class="w-full md:w-auto btn-magic px-8 py-3 rounded-xl font-bold text-base text-yellow-300">
+          <i class="fa-solid fa-check mr-2"></i>모든 변경사항 영구 저장하기
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function updateAdminField(qIdx, field, value) {
+  tempQuizList[qIdx][field] = value;
+}
+
+function updateAdminOption(qIdx, oIdx, value) {
+  tempQuizList[qIdx].options[oIdx] = value;
+}
+
+function updateAdminAnswer(qIdx, oIdx) {
+  tempQuizList[qIdx].answer = oIdx;
+  renderAdminEditor();
+}
+
+function updateAdminImageUrl(qIdx, url) {
+  tempQuizList[qIdx].imageUrl = url.trim();
+  const box = document.getElementById(`preview-box-${qIdx}`);
+  const img = document.getElementById(`preview-img-${qIdx}`);
+  if (url.trim()) {
+    img.src = url.trim();
+    box.classList.remove('hidden');
+  } else {
+    box.classList.add('hidden');
+  }
+}
+
+function handleAdminImageUpload(qIdx, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 1.5 * 1024 * 1024) {
+    alert("파일 크기가 1.5MB를 초과합니다. 여러 기기에서 빠르게 불러오려면 인터넷 이미지/GIF 주소(URL)를 붙여넣는 것을 권장합니다.");
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    tempQuizList[qIdx].imageUrl = e.target.result;
+    renderAdminEditor();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearAdminImage(qIdx) {
+  tempQuizList[qIdx].imageUrl = "";
+  renderAdminEditor();
+}
+
+function addAdminQuestion() {
+  tempQuizList.push({
+    id: Date.now(),
+    question: "새로운 마법 문제를 입력하세요",
+    imageUrl: "",
+    options: ["보기 1", "보기 2", "보기 3", "보기 4"],
+    answer: 0,
+    timeLimit: 15,
+    points: 1000
+  });
+  renderAdminEditor();
+}
+
+function deleteAdminQuestion(qIdx) {
+  if (tempQuizList.length <= 1) {
+    alert("최소 1개 이상의 문제가 필요합니다.");
+    return;
+  }
+  if (confirm(`문제 ${qIdx + 1}번을 삭제하시겠습니까?`)) {
+    tempQuizList.splice(qIdx, 1);
+    renderAdminEditor();
+  }
+}
+
+function resetAdminQuizData() {
+  if (confirm("모든 문제를 초기 기본값으로 되돌리시겠습니까?")) {
+    tempQuizList = JSON.parse(JSON.stringify(DEFAULT_QUIZ_DATA));
+    renderAdminEditor();
+  }
+}
+
+async function saveAdminQuizData() {
+  for (let i = 0; i < tempQuizList.length; i++) {
+    const q = tempQuizList[i];
+    if (!q.question.trim()) {
+      alert(`문제 ${i + 1}번의 질문 내용을 입력해 주세요.`);
+      return;
+    }
+    if (q.options.some(opt => !opt.trim())) {
+      alert(`문제 ${i + 1}번의 4개 선택지를 모두 입력해 주세요.`);
+      return;
+    }
+    if (!q.points || q.points <= 0) q.points = 1000;
+    if (!q.timeLimit || q.timeLimit < 3) q.timeLimit = 15;
+  }
+
+  QUIZ_DATA = JSON.parse(JSON.stringify(tempQuizList));
+  const ok = await saveQuizDataToServer(QUIZ_DATA);
+  if (ok) {
+    alert("퀴즈 설정이 저장되었습니다!");
+    showRoleSelection();
+  }
+}
+
+// ==========================================
+// 5. HOST (진행자) 로직
+// ==========================================
+class HostController {
+  constructor() {
+    this.pin = Math.floor(100000 + Math.random() * 900000).toString();
+    this.players = new Map();
+    this.currentQIndex = -1;
+    this.state = 'LOBBY';
+    this.timer = null;
+    this.timeLeft = 0;
+    this.questionStartTime = 0;
+
+    bus.connect(this.pin, () => {
+      console.log(`[Host] Supabase Realtime connected on PIN: ${this.pin}`);
+    });
+    bus.onMessage((msg) => this.handleMessage(msg));
+  }
+
+  handleMessage(msg) {
+    if (msg.type === 'JOIN') {
+      const { playerId, nickname, house } = msg;
+      let player = this.players.get(playerId);
+      if (!player) {
+        player = {
+          id: playerId,
+          nickname,
+          house,
+          score: 0,
+          lastAnswer: null,
+          lastGained: 0
+        };
+        this.players.set(playerId, player);
+      } else {
+        player.nickname = nickname;
+        player.house = house;
+      }
+
+      bus.send({
+        type: 'JOIN_RESULT',
+        targetId: playerId,
+        success: true,
+        gameState: this.state
+      });
+      this.renderLobby();
+
+    } else if (msg.type === 'ANSWER') {
+      if (this.state !== 'QUESTION') return;
+      const { playerId, answerIndex } = msg;
+      const player = this.players.get(playerId);
+
+      if (player && player.lastAnswer === null) {
+        const now = Date.now();
+        const timeTaken = (now - this.questionStartTime) / 1000;
+        const q = QUIZ_DATA[this.currentQIndex];
+
+        player.lastAnswer = answerIndex;
+        if (answerIndex === q.answer) {
+          const maxPoints = q.points || 1000;
+          const basePoints = Math.round(maxPoints * 0.5);
+          const bonusPoints = maxPoints - basePoints;
+          const remainingRatio = Math.max(0, (q.timeLimit - timeTaken) / q.timeLimit);
+          const scoreGained = Math.round(basePoints + (bonusPoints * remainingRatio));
+          player.score += scoreGained;
+          player.lastGained = scoreGained;
+        } else {
+          player.lastGained = 0;
+        }
+        this.updateSubmittedCount();
+      }
+    }
+  }
+
+  renderLobby() {
+    setBadge(`진행자 | PIN: ${this.pin}`);
+    const playerList = Array.from(this.players.values());
+
+    renderScreen(`
+      <div class="w-full max-w-3xl flex flex-col items-center">
+        <div class="magic-card p-6 rounded-2xl w-full text-center mb-6 relative">
+          <button onclick="openChairmanPrompt()" class="absolute top-4 right-4 text-xs px-3 py-1 border border-yellow-500/50 bg-yellow-950/60 rounded-full text-yellow-300 hover:bg-yellow-800/60">
+            <i class="fa-solid fa-key mr-1"></i>위원장 모드
+          </button>
+          <span class="text-sm text-yellow-300/70">참가 PIN 번호</span>
+          <div class="text-5xl font-black font-magic text-yellow-400 tracking-widest my-2 gold-glow">${this.pin}</div>
+          <p class="text-xs text-yellow-200/60">참가자는 스마트폰에서 위 PIN 번호를 입력하세요</p>
+        </div>
+
+        <div class="w-full mb-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-yellow-300">접속한 학생들 (${playerList.length}명)</h2>
+            <button onclick="hostAddBot()" class="text-xs px-3 py-1 bg-yellow-900/50 border border-yellow-600 rounded text-yellow-300 hover:bg-yellow-800/50">
+              + 가상 봇 추가
             </button>
           </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+            ${playerList.map(p => {
+              const h = HOUSES.find(x => x.id === p.house) || HOUSES[0];
+              return `
+                <div class="p-3 rounded-xl border ${h.color} flex items-center space-x-3 shadow-md">
+                  <i class="fa-solid ${h.icon} text-lg"></i>
+                  <div class="truncate">
+                    <div class="font-bold text-sm truncate">${escapeHtml(p.nickname)}</div>
+                    <div class="text-xs opacity-75">${h.name}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+            ${playerList.length === 0 ? '<div class="col-span-full text-center py-8 text-yellow-500/50">학생들이 입장을 기다리고 있습니다...</div>' : ''}
+          </div>
         </div>
-      `);
+
+        <button onclick="host.nextQuestion()" ${playerList.length === 0
+          ? 'disabled class="opacity-50 btn-magic px-8 py-4 rounded-xl font-bold text-lg text-yellow-300 cursor-not-allowed"'
+          : 'class="btn-magic px-8 py-4 rounded-xl font-bold text-lg text-yellow-300"'}>
+          퀴즈 시작하기 (총 ${QUIZ_DATA.length}문제)
+        </button>
+      </div>
+    `);
+  }
+
+  nextQuestion() {
+    this.currentQIndex++;
+    if (this.currentQIndex >= QUIZ_DATA.length) {
+      this.endGame();
+      return;
     }
 
-    function submitJoin() {
-      const pin = document.getElementById('join-pin').value.trim();
-      const name = document.getElementById('join-name').value.trim();
-      const house = document.querySelector('input[name="house"]:checked')?.value || 'gryffindor';
+    this.players.forEach(p => {
+      p.lastAnswer = null;
+      p.lastGained = 0;
+    });
 
-      if (!pin || pin.length < 6) {
-        alert("6자리 PIN 번호를 입력해주세요.");
-        return;
+    const q = QUIZ_DATA[this.currentQIndex];
+    this.state = 'QUESTION';
+    this.timeLeft = q.timeLimit;
+    this.questionStartTime = Date.now();
+
+    bus.send({
+      type: 'QUESTION',
+      questionIndex: this.currentQIndex,
+      totalQuestions: QUIZ_DATA.length,
+      question: q.question,
+      options: q.options,
+      timeLimit: q.timeLimit
+    });
+
+    this.renderQuestionView();
+    this.startTimer();
+  }
+
+  startTimer() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      this.timeLeft--;
+      const timerEl = document.getElementById('host-timer');
+      if (timerEl) timerEl.innerText = this.timeLeft;
+      if (this.timeLeft <= 0) {
+        clearInterval(this.timer);
+        this.revealAnswer();
       }
-      if (!name) {
-        alert("이름을 입력해주세요.");
-        return;
+    }, 1000);
+  }
+
+  updateSubmittedCount() {
+    const submitted = Array.from(this.players.values()).filter(p => p.lastAnswer !== null).length;
+    const total = this.players.size;
+    const el = document.getElementById('submitted-count');
+    if (el) el.innerText = `${submitted} / ${total}`;
+
+    if (submitted >= total && total > 0) {
+      if (this.timer) clearInterval(this.timer);
+      this.revealAnswer();
+    }
+  }
+
+  renderQuestionView() {
+    const q = QUIZ_DATA[this.currentQIndex];
+    const hasMedia = q.imageUrl && q.imageUrl.trim() !== '';
+
+    renderScreen(`
+      <div class="w-full max-w-3xl flex flex-col items-center">
+        <div class="flex justify-between items-center w-full mb-4 px-2">
+          <div class="flex items-center space-x-3">
+            <span class="text-yellow-400 font-bold">Q ${this.currentQIndex + 1} / ${QUIZ_DATA.length}</span>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-yellow-900/60 border border-yellow-500/40 text-yellow-300">
+              배점: ${q.points || 1000}점
+            </span>
+          </div>
+          <div class="text-2xl font-black text-yellow-400 bg-yellow-950/60 border border-yellow-500/40 px-4 py-1 rounded-full">
+            <span id="host-timer">${this.timeLeft}</span>초
+          </div>
+        </div>
+
+        <div class="magic-card p-6 md:p-8 rounded-2xl w-full text-center mb-6">
+          <h2 class="text-2xl md:text-3xl font-bold text-yellow-200 ${hasMedia ? 'mb-5' : ''}">${escapeHtml(q.question)}</h2>
+          ${hasMedia ? `
+            <div class="flex justify-center">
+              <img src="${q.imageUrl}" alt="문제 이미지" class="max-h-64 md:max-h-80 rounded-xl border-2 border-yellow-500/50 shadow-lg object-contain bg-black/40">
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 w-full mb-6">
+          ${q.options.map((opt, i) => `
+            <div class="opt-${i} p-4 rounded-xl text-white font-bold text-center text-lg shadow-lg flex items-center justify-center min-h-[70px]">
+              <span class="mr-2 opacity-80">${['▲', '◆', '●', '■'][i]}</span> ${escapeHtml(opt)}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="text-sm text-yellow-300/80 mb-4">
+          제출 완료: <span id="submitted-count" class="font-bold text-yellow-400">0 / ${this.players.size}</span>
+        </div>
+
+        <button onclick="host.revealAnswer()" class="text-xs text-yellow-400/60 underline hover:text-yellow-300">
+          바로 결과 공개
+        </button>
+      </div>
+    `);
+  }
+
+  revealAnswer() {
+    if (this.timer) clearInterval(this.timer);
+    this.state = 'REVEAL';
+    const q = QUIZ_DATA[this.currentQIndex];
+
+    const sortedPlayers = Array.from(this.players.values())
+      .sort((a, b) => b.score - a.score);
+
+    bus.send({
+      type: 'REVEAL',
+      correctAnswer: q.answer,
+      scores: sortedPlayers.map((p, idx) => ({
+        id: p.id,
+        rank: idx + 1,
+        score: p.score,
+        gained: p.lastGained,
+        isCorrect: p.lastAnswer === q.answer
+      }))
+    });
+
+    this.renderRevealView();
+  }
+
+  renderRevealView() {
+    const q = QUIZ_DATA[this.currentQIndex];
+    const sortedPlayers = Array.from(this.players.values())
+      .sort((a, b) => b.score - a.score);
+
+    const correctCount = sortedPlayers.filter(p => p.lastAnswer === q.answer).length;
+
+    renderScreen(`
+      <div class="w-full max-w-3xl flex flex-col items-center">
+        <div class="flex items-center justify-between w-full mb-2 px-1">
+          <h2 class="text-xl font-bold text-yellow-400">
+            <i class="fa-solid fa-scroll mr-2"></i>Q${this.currentQIndex + 1} 정답 공개
+          </h2>
+          <span class="text-xs text-yellow-200/80 bg-yellow-950/70 border border-yellow-500/40 px-3 py-1 rounded-full">
+            정답자: ${correctCount}명 / 전체 ${sortedPlayers.length}명
+          </span>
+        </div>
+
+        <div class="opt-${q.answer} p-4 rounded-xl text-white font-bold text-center text-xl shadow-lg w-full mb-5 border-2 border-yellow-300">
+          정답: ${['▲', '◆', '●', '■'][q.answer]} ${escapeHtml(q.options[q.answer])}
+        </div>
+
+        <!-- 전체 참가자 점수 현황판 (전체 인원 스크롤 가능) -->
+        <div class="magic-card p-5 rounded-2xl w-full mb-6">
+          <div class="flex justify-between items-center mb-3 border-b border-yellow-600/30 pb-2">
+            <h3 class="text-lg font-bold text-yellow-300">
+              <i class="fa-solid fa-ranking-star mr-2 text-yellow-400"></i>전체 참가자 점수 현황 (총 ${sortedPlayers.length}명)
+            </h3>
+            <span class="text-xs text-yellow-200/60">아래로 스크롤하여 전체 순위 확인 ↕</span>
+          </div>
+
+          <div class="space-y-2 max-h-[360px] overflow-y-auto custom-scrollbar pr-2">
+            ${sortedPlayers.map((p, idx) => {
+              const h = HOUSES.find(x => x.id === p.house) || HOUSES[0];
+              const isCorrect = p.lastAnswer === q.answer;
+              const didAnswer = p.lastAnswer !== null;
+
+              let rankBadge = `<span class="font-bold text-yellow-500 w-7 text-center">#${idx + 1}</span>`;
+              if (idx === 0) rankBadge = `<span class="w-7 text-center text-lg">🥇</span>`;
+              else if (idx === 1) rankBadge = `<span class="w-7 text-center text-lg">🥈</span>`;
+              else if (idx === 2) rankBadge = `<span class="w-7 text-center text-lg">🥉</span>`;
+
+              return `
+                <div class="flex items-center justify-between p-3 rounded-xl ${isCorrect ? 'bg-green-950/35 border border-green-500/40' : 'bg-yellow-950/30 border border-yellow-600/20'}">
+                  <div class="flex items-center space-x-2.5 min-w-0">
+                    ${rankBadge}
+                    <span class="font-bold text-yellow-100 truncate">${escapeHtml(p.nickname)}</span>
+                    <span class="text-[11px] px-2 py-0.5 rounded shrink-0 ${h.color}">${h.name}</span>
+                    ${isCorrect
+                      ? `<span class="text-[11px] px-2 py-0.5 rounded bg-green-600/30 text-green-300 border border-green-500/40 shrink-0">⭕ +${p.lastGained}</span>`
+                      : (didAnswer
+                          ? `<span class="text-[11px] px-2 py-0.5 rounded bg-red-600/20 text-red-300 border border-red-500/30 shrink-0">❌ 오답</span>`
+                          : `<span class="text-[11px] px-2 py-0.5 rounded bg-gray-700/40 text-gray-300 shrink-0">미제출</span>`
+                        )
+                    }
+                  </div>
+                  <div class="text-right shrink-0 ml-2">
+                    <span class="font-black text-yellow-400 text-base">${p.score.toLocaleString()} pts</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <button onclick="host.nextQuestion()" class="btn-magic px-8 py-4 rounded-xl font-bold text-lg text-yellow-300">
+          ${this.currentQIndex + 1 < QUIZ_DATA.length ? '다음 문제 출제 ➔' : '최종 시상대 보기 🏆'}
+        </button>
+      </div>
+    `);
+  }
+
+  endGame() {
+    this.state = 'END';
+    const sorted = Array.from(this.players.values()).sort((a, b) => b.score - a.score);
+
+    bus.send({
+      type: 'GAME_OVER',
+      rankings: sorted.map((p, idx) => ({
+        id: p.id,
+        rank: idx + 1,
+        score: p.score
+      }))
+    });
+
+    if (typeof confetti === 'function') {
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    }
+
+    const first = sorted[0];
+    const second = sorted[1];
+    const third = sorted[2];
+
+    renderScreen(`
+      <div class="w-full max-w-3xl text-center">
+        <h1 class="text-4xl font-black font-magic text-yellow-400 gold-glow mb-1">최종 결과 발표</h1>
+        <p class="text-yellow-200/70 mb-6">호그와트 기말고사 명예의 전당</p>
+
+        <!-- 1, 2, 3등 시상대 (Podium) -->
+        <div class="grid grid-cols-3 gap-3 items-end mb-6 px-2">
+          <!-- 2등 -->
+          <div class="flex flex-col items-center">
+            ${second ? `
+              <div class="magic-card p-4 rounded-t-2xl w-full border-gray-300/70 bg-slate-900/80 min-h-[155px] flex flex-col justify-center">
+                <div class="text-3xl mb-1">🥈</div>
+                <div class="font-bold text-base text-gray-200 truncate">${escapeHtml(second.nickname)}</div>
+                <div class="text-xs text-gray-400 mb-1">${(HOUSES.find(h => h.id === second.house) || {}).name || ''}</div>
+                <div class="font-black text-gray-200">${second.score.toLocaleString()} pts</div>
+              </div>
+            ` : '<div class="w-full h-32"></div>'}
+          </div>
+
+          <!-- 1등 -->
+          <div class="flex flex-col items-center">
+            ${first ? `
+              <div class="magic-card p-5 rounded-t-2xl w-full border-2 border-yellow-400 gold-glow min-h-[195px] flex flex-col justify-center">
+                <div class="text-4xl mb-1">🥇</div>
+                <div class="font-black text-xl text-yellow-300 truncate">${escapeHtml(first.nickname)}</div>
+                <div class="text-xs text-yellow-200/80 mb-1">${(HOUSES.find(h => h.id === first.house) || {}).name || ''}</div>
+                <div class="font-black text-lg text-yellow-400">${first.score.toLocaleString()} pts</div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- 3등 -->
+          <div class="flex flex-col items-center">
+            ${third ? `
+              <div class="magic-card p-4 rounded-t-2xl w-full border-amber-600/70 bg-amber-950/40 min-h-[130px] flex flex-col justify-center">
+                <div class="text-3xl mb-1">🥉</div>
+                <div class="font-bold text-base text-amber-200 truncate">${escapeHtml(third.nickname)}</div>
+                <div class="text-xs text-amber-300/70 mb-1">${(HOUSES.find(h => h.id === third.house) || {}).name || ''}</div>
+                <div class="font-black text-amber-300">${third.score.toLocaleString()} pts</div>
+              </div>
+            ` : '<div class="w-full h-24"></div>'}
+          </div>
+        </div>
+
+        <!-- 전체 참가자 최종 순위 스크롤 리스트 -->
+        <div class="magic-card p-5 rounded-2xl w-full mb-6 text-left">
+          <h3 class="text-base font-bold text-yellow-300 mb-3 border-b border-yellow-600/30 pb-2">
+            전체 학생 최종 성적표 (총 ${sorted.length}명)
+          </h3>
+          <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+            ${sorted.map((p, idx) => {
+              const h = HOUSES.find(x => x.id === p.house) || HOUSES[0];
+              return `
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-yellow-950/30 border border-yellow-600/20">
+                  <div class="flex items-center space-x-3">
+                    <span class="font-bold text-yellow-500 w-7">#${idx + 1}</span>
+                    <span class="font-bold text-yellow-100">${escapeHtml(p.nickname)}</span>
+                    <span class="text-xs px-2 py-0.5 rounded ${h.color}">${h.name}</span>
+                  </div>
+                  <span class="font-black text-yellow-400">${p.score.toLocaleString()} pts</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <button onclick="showRoleSelection()" class="btn-magic px-8 py-3 rounded-xl font-bold text-yellow-300">
+          메인 화면으로 돌아가기
+        </button>
+      </div>
+    `);
+  }
+}
+
+let host = null;
+
+function startHost() {
+  state.role = 'host';
+  state.host = new HostController();
+  host = state.host;
+  state.host.renderLobby();
+}
+
+function hostAddBot() {
+  if (!state.host) return;
+  const botNames = ['해리', '론', '헤르미온느', '말포이', '네빌', '루나', '지니', '프레드', '조지', '세드릭'];
+  const randomName = botNames[Math.floor(Math.random() * botNames.length)] + Math.floor(Math.random() * 100);
+  const randomHouse = HOUSES[Math.floor(Math.random() * HOUSES.length)].id;
+  const botId = 'bot-' + Math.random().toString(36).substr(2, 9);
+
+  state.host.handleMessage({
+    type: 'JOIN',
+    playerId: botId,
+    nickname: randomName,
+    house: randomHouse
+  });
+}
+
+// ==========================================
+// 6. PLAYER (참가자) 로직
+// ==========================================
+class PlayerController {
+  constructor() {
+    let savedId = localStorage.getItem('hp_quiz_player_id');
+    if (!savedId) {
+      savedId = 'player-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('hp_quiz_player_id', savedId);
+    }
+    this.id = savedId;
+    this.nickname = '';
+    this.house = HOUSES[0].id;
+    this.pin = '';
+    this.myScore = 0;
+    this.myRank = null;
+    this.selectedAnswer = null;
+    this.hasAnswered = false;
+  }
+
+  joinGame(pin, nickname, house) {
+    this.pin = pin;
+    this.nickname = nickname;
+    this.house = house;
+
+    bus.connect(this.pin, () => {
+      bus.send({
+        type: 'JOIN',
+        playerId: this.id,
+        nickname: this.nickname,
+        house: this.house
+      });
+    });
+
+    bus.onMessage((msg) => this.handleMessage(msg));
+
+    renderScreen(`
+      <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-yellow-400 mb-4"></i>
+        <h2 class="text-xl font-bold text-yellow-300 mb-2">호그와트 연결 중...</h2>
+        <p class="text-xs text-yellow-200/60">진행자가 게임을 시작할 때까지 기다려주세요.</p>
+      </div>
+    `);
+  }
+
+  handleMessage(msg) {
+    if (msg.type === 'JOIN_RESULT') {
+      if (msg.targetId === this.id && msg.success) {
+        this.renderWaitingView();
       }
-
-      player.joinGame(pin, name, house);
-    }
-
-    // ==========================================
-    // 7. 위원장 모드 및 비디오 제어
-    // ==========================================
-    function openChairmanPrompt() {
-      const input = prompt("위원장 비밀코드를 입력하세요:");
-      if (input === CHAIRMAN_CODE) {
-        document.getElementById('video-iframe').src = VIDEO_URL;
-        document.getElementById('video-modal').classList.remove('hidden');
-      } else if (input !== null) {
-        alert("비밀코드가 일치하지 않습니다!");
+    } else if (msg.type === 'QUESTION') {
+      this.selectedAnswer = null;
+      this.hasAnswered = false;
+      this.renderQuestionView(msg);
+    } else if (msg.type === 'REVEAL') {
+      const myResult = msg.scores.find(s => s.id === this.id);
+      if (myResult) {
+        this.myScore = myResult.score;
+        this.myRank = myResult.rank;
       }
+      this.renderResultView(msg.correctAnswer, myResult ? myResult.isCorrect : false, myResult ? myResult.gained : 0);
+    } else if (msg.type === 'GAME_OVER') {
+      if (msg.rankings) {
+        const me = msg.rankings.find(r => r.id === this.id);
+        if (me) {
+          this.myScore = me.score;
+          this.myRank = me.rank;
+        }
+      }
+      this.renderGameOverView();
+    } else if (msg.type === 'RESET') {
+      showRoleSelection();
     }
+  }
 
-    function closeVideoModal() {
-      document.getElementById('video-iframe').src = "";
-      document.getElementById('video-modal').classList.add('hidden');
-    }
+  renderWaitingView() {
+    const h = HOUSES.find(x => x.id === this.house) || HOUSES[0];
+    setBadge(`참가자 | ${this.nickname}`);
+    renderScreen(`
+      <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
+        <div class="inline-block p-4 rounded-full ${h.color} mb-4">
+          <i class="fa-solid ${h.icon} text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-yellow-300 mb-1">${escapeHtml(this.nickname)}</h2>
+        <p class="text-sm text-yellow-200/70 mb-6">${h.name} 기숙사</p>
+        <div class="p-4 rounded-xl bg-yellow-950/40 border border-yellow-600/30 text-yellow-400 animate-pulse text-sm">
+          진행자가 문제를 내기를 기다리고 있습니다...
+        </div>
+      </div>
+    `);
+  }
 
-    // 초기 화면 렌더링
-    showRoleSelection();
-  </script>
+  sendAnswer(index) {
+    if (this.hasAnswered) return;
+    this.selectedAnswer = index;
+    this.hasAnswered = true;
+
+    bus.send({
+      type: 'ANSWER',
+      playerId: this.id,
+      answerIndex: index
+    });
+
+    this.renderAnswerSubmittedView();
+  }
+
+  renderQuestionView(qMsg) {
+    renderScreen(`
+      <div class="w-full max-w-md flex flex-col items-center">
+        <div class="flex justify-between items-center w-full mb-4 px-2">
+          <span class="text-xs text-yellow-400">Q ${qMsg.questionIndex + 1} / ${qMsg.totalQuestions}</span>
+          <span class="text-xs text-yellow-300 font-bold">내 점수: ${this.myScore.toLocaleString()}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-4 w-full h-64">
+          ${qMsg.options.map((_, idx) => `
+            <button onclick="player.sendAnswer(${idx})" class="opt-${idx} rounded-2xl flex items-center justify-center text-white text-4xl font-bold shadow-lg active:scale-95 transition-transform">
+              ${['▲', '◆', '●', '■'][idx]}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `);
+  }
+
+  renderAnswerSubmittedView() {
+    renderScreen(`
+      <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
+        <i class="fa-solid fa-paper-plane text-4xl text-yellow-400 mb-4 animate-bounce"></i>
+        <h2 class="text-2xl font-bold text-yellow-300 mb-2">답안 제출 완료!</h2>
+        <p class="text-xs text-yellow-200/60">다른 학생들의 제출을 기다리는 중입니다.</p>
+      </div>
+    `);
+  }
+
+  renderResultView(correctAnswer, isCorrect, gained) {
+    renderScreen(`
+      <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
+        <div class="text-5xl mb-4">
+          ${isCorrect ? '✨' : '💥'}
+        </div>
+        <h2 class="text-2xl font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'} mb-2">
+          ${isCorrect ? `정답입니다! (+${gained}점)` : '틀렸습니다...'}
+        </h2>
+        <div class="text-lg text-yellow-300 font-bold mb-1">
+          누적 점수: ${this.myScore.toLocaleString()} pts
+        </div>
+        ${this.myRank ? `<div class="text-sm text-yellow-200/80 mb-6">현재 순위: ${this.myRank}등</div>` : '<div class="mb-6"></div>'}
+        <p class="text-xs text-yellow-200/60">다음 문제를 기다려주세요</p>
+      </div>
+    `);
+  }
+
+  renderGameOverView() {
+    renderScreen(`
+      <div class="magic-card p-8 rounded-2xl text-center max-w-md w-full">
+        <i class="fa-solid fa-award text-5xl text-yellow-400 mb-4 gold-glow"></i>
+        <h2 class="text-3xl font-bold font-magic text-yellow-400 mb-2">퀴즈 종료!</h2>
+        ${this.myRank ? `<p class="text-lg font-bold text-yellow-200 mb-1">최종 ${this.myRank}등</p>` : ''}
+        <p class="text-sm text-yellow-200/70 mb-4">최종 점수</p>
+        <div class="text-4xl font-black text-yellow-300 gold-glow mb-6">${this.myScore.toLocaleString()} pts</div>
+        <button onclick="showRoleSelection()" class="btn-magic px-6 py-3 rounded-xl font-bold text-yellow-300 text-sm">
+          메인 화면으로
+        </button>
+      </div>
+    `);
+  }
+}
+
+let player = null;
+
+function startPlayerScreen() {
+  state.role = 'player';
+  player = new PlayerController();
+  setBadge("참가자 설정");
+
+  renderScreen(`
+    <div class="magic-card p-8 rounded-2xl max-w-md w-full">
+      <h2 class="text-2xl font-bold text-center text-yellow-400 font-magic mb-6">학생 등록</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-yellow-300/80 mb-1">PIN 번호 6자리</label>
+          <input id="join-pin" type="text" maxlength="6" placeholder="예: 123456"
+            class="w-full bg-yellow-950/40 border border-yellow-600/50 rounded-xl px-4 py-3 text-yellow-200 placeholder-yellow-700/50 focus:outline-none focus:border-yellow-400 text-center text-xl font-bold tracking-widest">
+        </div>
+        <div>
+          <label class="block text-xs text-yellow-300/80 mb-1">이름 / 닉네임</label>
+          <input id="join-name" type="text" placeholder="이름을 입력하세요"
+            class="w-full bg-yellow-950/40 border border-yellow-600/50 rounded-xl px-4 py-3 text-yellow-200 placeholder-yellow-700/50 focus:outline-none focus:border-yellow-400">
+        </div>
+        <div>
+          <label class="block text-xs text-yellow-300/80 mb-1">기숙사 선택</label>
+          <div class="grid grid-cols-2 gap-2">
+            ${HOUSES.map((h, idx) => `
+              <label class="cursor-pointer">
+                <input type="radio" name="house" value="${h.id}" ${idx === 0 ? 'checked' : ''} class="peer hidden">
+                <div class="p-3 rounded-xl border border-yellow-600/30 peer-checked:border-yellow-400 peer-checked:bg-yellow-900/40 flex items-center space-x-2 text-sm text-yellow-200">
+                  <i class="fa-solid ${h.icon}"></i>
+                  <span>${h.name}</span>
+                </div>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+        <button onclick="submitJoin()" class="btn-magic w-full py-4 rounded-xl font-bold text-yellow-300 text-lg mt-4">
+          입장하기
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+function submitJoin() {
+  const pin = document.getElementById('join-pin').value.trim();
+  const name = document.getElementById('join-name').value.trim();
+  const house = document.querySelector('input[name="house"]:checked')?.value || 'gryffindor';
+
+  if (!pin || pin.length < 6) {
+    alert("6자리 PIN 번호를 입력해주세요.");
+    return;
+  }
+  if (!name) {
+    alert("이름을 입력해주세요.");
+    return;
+  }
+  player.joinGame(pin, name, house);
+}
+
+// ==========================================
+// 7. 위원장 모드 및 비디오 제어
+// ==========================================
+function openChairmanPrompt() {
+  const input = prompt("위원장 비밀코드를 입력하세요:");
+  if (input === CHAIRMAN_CODE) {
+    document.getElementById('video-iframe').src = VIDEO_URL;
+    document.getElementById('video-modal').classList.remove('hidden');
+  } else if (input !== null) {
+    alert("비밀코드가 일치하지 않습니다!");
+  }
+}
+
+function closeVideoModal() {
+  document.getElementById('video-iframe').src = "";
+  document.getElementById('video-modal').classList.add('hidden');
+}
+
+// 초기 화면 렌더링
+showRoleSelection();
+</script>
 </body>
 </html>
+```[cite: 28]
